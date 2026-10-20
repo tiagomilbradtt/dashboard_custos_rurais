@@ -1,0 +1,40 @@
+/* Estilos do painel. O Tailwind (CDN) cuida das classes utilitárias; aqui ficam os componentes reutilizáveis.
+   Os componentes ficam em @layer para que as utilitárias do Tailwind (ex.: p-0, !w-32) continuem vencendo. */
+body { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+
+@layer components {
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: .5rem; padding: 1rem; }
+  .dark .card { background: #111A2B; border-color: #1e293b; }
+
+  .lbl { display: flex; flex-direction: column; gap: .25rem; font-size: .75rem; font-weight: 500; color: #64748b; }
+  .dark .lbl { color: #94a3b8; }
+
+  .inp { width: 100%; border-radius: .375rem; border: 1px solid #cbd5e1; background: #fff; padding: .375rem .5rem;
+         font-size: .875rem; line-height: 1.25rem; color: #0f172a; }
+  .inp:focus { outline: none; box-shadow: 0 0 0 2px #0d9488; }
+  .dark .inp { border-color: #334155; background: #0B1220; color: #f1f5f9; }
+
+  .btn { display: inline-flex; align-items: center; gap: .25rem; border-radius: .375rem; border: 1px solid #cbd5e1;
+         padding: .375rem .75rem; font-size: .875rem; line-height: 1.25rem; font-weight: 500; }
+  .btn:hover { background: #f1f5f9; }
+  .btn:disabled { opacity: .4; }
+  .dark .btn { border-color: #334155; }
+  .dark .btn:hover { background: #1e293b; }
+
+  .btn-p { display: inline-flex; align-items: center; gap: .25rem; border-radius: .375rem; background: #0f766e; color: #fff;
+           padding: .375rem .75rem; font-size: .875rem; line-height: 1.25rem; font-weight: 500; }
+  .btn-p:hover { background: #115e59; }
+
+  .tab { padding: .375rem .75rem; border-radius: .375rem; font-size: .875rem; line-height: 1.25rem; font-weight: 500; color: #475569; }
+  .tab:hover { background: #e2e8f0; }
+  .dark .tab { color: #cbd5e1; }
+  .dark .tab:hover { background: #1e293b; }
+  .tab.on, .tab.on:hover { background: #0f766e; color: #fff; }
+}
+
+@media print {
+  #bar, #nav, #filt, .np { display: none !important; }
+  html { color-scheme: light; }
+  body { background: #fff !important; color: #000 !important; }
+  .card { break-inside: avoid; background: #fff !important; }
+}

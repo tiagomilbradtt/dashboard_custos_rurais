@@ -1,0 +1,11 @@
+{
+  "name": "dashboard-custos-rurais",
+  "version": "1.0.0",
+  "description": "Painel de custos para propriedades rurais: lê planilhas Excel/CSV e gera KPIs, gráficos, custo por hectare e rateio entre culturas.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custos da Propriedade — Modelo (dados fictícios)</title>
+<meta name="description" content="Painel de custos para propriedades rurais: lê planilhas Excel/CSV e gera KPIs, gráficos, custo por hectare e rateio entre culturas.">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:'class'}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-[#EEF1F4] dark:bg-[#0B1220] text-slate-800 dark:text-slate-100 min-h-screen">
+
+<header id="bar" class="sticky top-0 z-20 bg-white/90 dark:bg-[#0B1220]/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+  <div class="max-w-[1400px] mx-auto px-4 py-2 flex flex-wrap items-center gap-2">
+    <div class="mr-auto min-w-0">
+      <h1 class="font-semibold text-lg leading-tight">Custos da Propriedade</h1>
+      <p id="fname" class="text-xs text-slate-500 truncate">Nenhum arquivo carregado</p>
+    </div>
+    <button id="bA" class="btn">Gerar novos dados de exemplo</button>
+    <label class="btn cursor-pointer">Abrir planilha<input id="file" type="file" accept=".xlsx,.xls,.xlsm" class="hidden"></label>
+    <button id="bX" class="btn hidden ex">Exportar Excel</button>
+    <button id="bP" class="btn hidden ex">Exportar PDF</button>
+    <button id="bT" class="btn">Modo escuro</button>
+  </div>
+</header>
+
+<main class="max-w-[1400px] mx-auto p-4 space-y-4">
+  <section id="drop" class="card border-dashed border-2 flex flex-col items-center text-center gap-3 py-20">
+    <h2 class="text-2xl font-semibold">Carregando dados de exemplo...</h2>
+    <p id="autoMsg" class="text-slate-500 max-w-md">Este é um modelo com dados fictícios, só para demonstração. Lê a aba "Entrada de Dados" e, se existirem, Investimentos, Pró-labores, Comissões e Informações Variáveis de uma planilha real. Os dados ficam no seu navegador e não são enviados para lugar nenhum.</p>
+    <label class="btn-p cursor-pointer">Escolher arquivo manualmente<input id="file2" type="file" accept=".xlsx,.xls,.xlsm" class="hidden"></label>
+  </section>
+
+  <div id="app" class="hidden space-y-4">
+    <div class="flex flex-wrap items-end gap-3 justify-between">
+      <nav id="nav" class="flex gap-1 flex-wrap">
+        <button class="tab" data-t="geral">Visão geral</button><button class="tab" data-t="cult">Por cultura</button><button class="tab" data-t="ha">Por hectare</button>
+        <button class="tab" data-t="top">Maiores gastos</button><button class="tab" data-t="busca">Busca</button>
+      </nav>
+      <div id="filt" class="flex flex-wrap gap-2 items-end">
+        <label class="lbl">De<input id="fFrom" type="date" class="inp"></label>
+        <label class="lbl">Até<input id="fTo" type="date" class="inp"></label>
+        <label class="lbl">Categoria<select id="fCat" class="inp"></select></label>
+        <button id="bR" class="btn">Limpar</button>
+      </div>
+    </div>
+    <p id="cnt" class="text-sm text-slate-500"></p>
+    <div id="haBox" class="card flex flex-wrap items-end gap-3">
+      <div class="mr-auto"><h3 class="font-semibold">Hectares plantados</h3><p class="text-xs text-slate-500">Opcional. Informe para calcular o custo por hectare.</p></div>
+      <label class="lbl">Soja (ha)<input id="haS" type="text" inputmode="decimal" placeholder="ex.: 250" class="inp !w-32"></label>
+      <label class="lbl">Arroz (ha)<input id="haA" type="text" inputmode="decimal" placeholder="ex.: 180" class="inp !w-32"></label>
+    </div>
+
+    <section id="t-geral" class="space-y-4">
+      <div id="kpis" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3"></div>
+      <div class="grid xl:grid-cols-3 gap-4">
+        <div class="card xl:col-span-2"><h3 class="font-semibold mb-2">Total gasto por categoria</h3><div class="h-80"><canvas id="cCat"></canvas></div></div>
+        <div class="card"><h3 class="font-semibold mb-3">Ranking de categorias</h3><ol id="rank" class="space-y-2 text-sm"></ol></div>
+      </div>
+      <div class="card"><h3 class="font-semibold mb-2">Subcategorias com maior gasto</h3><div class="h-80"><canvas id="cSub"></canvas></div></div>
+    </section>
+
+    <section id="t-cult" class="space-y-4 hidden">
+      <div id="ckpis" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+      <div class="grid xl:grid-cols-3 gap-4">
+        <div class="card"><h3 class="font-semibold mb-2">Divisão do gasto por cultura</h3><div class="h-72"><canvas id="cCult"></canvas></div></div>
+        <div class="card xl:col-span-2"><h3 class="font-semibold mb-2">Custo por cultura em cada categoria</h3><div class="h-72"><canvas id="cCC"></canvas></div></div>
+      </div>
+      <div class="card p-0 overflow-hidden"><h3 class="font-semibold p-4 pb-2">Detalhe por categoria</h3><div class="overflow-x-auto"><table id="tCult" class="w-full text-sm"></table></div></div>
+    </section>
+
+    <section id="t-ha" class="space-y-4 hidden">
+      <p id="hmsg" class="text-sm text-amber-700 dark:text-amber-400"></p>
+      <div id="hkpis" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+      <div class="grid xl:grid-cols-3 gap-4">
+        <div class="card xl:col-span-2"><h3 class="font-semibold mb-2">Custo por hectare por categoria (soja e arroz)</h3><div class="h-80"><canvas id="cHa1"></canvas></div></div>
+        <div class="card"><h3 class="font-semibold mb-2">% do custo total por categoria</h3><div class="h-80"><canvas id="cHa2"></canvas></div></div>
+      </div>
+      <div class="card"><h3 class="font-semibold mb-2">Subcategorias: custo total por hectare</h3><div class="h-80"><canvas id="cHa3"></canvas></div></div>
+      <div class="card p-0 overflow-hidden">
+        <div class="p-4 flex items-center justify-between gap-2 flex-wrap"><h3 class="font-semibold">Custo por hectare e participação no custo</h3>
+          <label class="text-xs text-slate-500 flex items-center gap-2">Mostrar<select id="haLv" class="inp !w-auto"><option value="sub">Categorias e subcategorias</option><option value="cat">Só categorias</option></select></label></div>
+        <div class="overflow-x-auto"><table id="tHa" class="w-full text-sm"></table></div>
+      </div>
+    </section>
+
+    <section id="t-top" class="hidden">
+      <div class="card p-0 overflow-hidden">
+        <div class="p-4 flex items-center justify-between gap-2 flex-wrap"><h3 class="font-semibold">Maiores lançamentos</h3>
+          <label class="text-xs text-slate-500 flex items-center gap-2">Mostrar<select id="topN" class="inp !w-auto"><option>10</option><option selected>20</option><option>50</option><option>100</option></select></label></div>
+        <div class="overflow-x-auto"><table id="tTop" class="w-full text-sm"></table></div>
+      </div>
+    </section>
+
+    <section id="t-busca" class="space-y-3 hidden">
+      <div class="card space-y-2">
+        <input id="q" type="search" placeholder="Buscar em todos os lançamentos: descrição, beneficiário, documento, valor, data..." class="inp">
+        <p id="qinfo" class="text-sm text-slate-500"></p>
+      </div>
+      <div class="card p-0 overflow-hidden">
+        <div class="overflow-x-auto"><table id="tBusca" class="w-full text-sm"></table></div>
+        <div class="p-3 flex items-center justify-between gap-2 border-t border-slate-200 dark:border-slate-800 text-sm np">
+          <span id="pinfo" class="text-slate-500"></span>
+          <div class="flex gap-2"><button id="pp" class="btn">Anterior</button><button id="pn" class="btn">Próxima</button></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
