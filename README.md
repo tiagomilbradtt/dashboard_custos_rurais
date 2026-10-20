@@ -7,7 +7,7 @@ Roda 100% no navegador: os dados da planilha **não são enviados para nenhum se
 > **Projeto desenvolvido com IA:** todo o código foi criado em conversa com o [Claude](https://claude.ai) (Anthropic), pelo claude.ai. Veja a seção [Desenvolvimento com IA](#desenvolvimento-com-ia).
 
 <!-- Adicione um print em docs/screenshot.png e descomente a linha abaixo -->
-<!-- ![Painel de custos](docs/screenshot.png) -->
+[Painel de custos](docs/screenshot.png)
 
 **Demo:** [Acessar painel online](https://tiagomilbradtt.github.io/dashboard_custos_rurais/) — usa dados fictícios gerados na hora.
 
