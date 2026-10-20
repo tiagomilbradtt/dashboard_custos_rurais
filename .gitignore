@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+# Nunca versionar planilhas reais (dados de clientes)
+*.xlsx
+*.xls
+*.xlsm
+*.csv
