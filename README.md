@@ -9,7 +9,7 @@ Roda 100% no navegador: os dados da planilha **não são enviados para nenhum se
 <!-- Adicione um print em docs/screenshot.png e descomente a linha abaixo -->
 <!-- ![Painel de custos](docs/screenshot.png) -->
 
-**Demo:** _([Dashboard Demo]https://tiagomilbradtt.github.io/dashboard_custos_rurais/)_ — usa dados fictícios gerados na hora.
+**Demo:** [Ver demonstração online](https://tiagomilbradtt.github.io/dashboard_custos_rurais/) — usa dados fictícios gerados na hora.
 
 ## Funcionalidades
 
